@@ -11,48 +11,50 @@ import dash_html_components as html
 
 # ---------------------------------------------------------------------------------------------
 # Import and cleaning data (importing csv into pandas)
-death_df = pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
-confirmed_df = pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
-recorved_df =  pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv")
-country_df =  pd.read_csv("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/web-data/data/cases_country.csv")
+death_df = pd.read_csv(
+    "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv")
+confirmed_df = pd.read_csv(
+    "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv")
+recorved_df = pd.read_csv(
+    "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv")
+country_df = pd.read_csv(
+    "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/web-data/data/cases_country.csv")
 
-confirmed_df = confirmed_df.rename(columns = {'Country/Region': 'country'})
-death_df = death_df.rename(columns = {'Country/Region': 'country'})
+confirmed_df = confirmed_df.rename(columns={'Country/Region': 'country'})
+death_df = death_df.rename(columns={'Country/Region': 'country'})
 
-sorted_mortality_rates_df = country_df.sort_values('Mortality_Rate', ascending = False)
+confirmed_df = confirmed_df.rename(columns={'Country/Region': 'country'})
+death_df = death_df.rename(columns={'Country/Region': 'country'})
+
+sorted_mortality_rates_df = country_df.sort_values(
+    'Mortality_Rate', ascending=False)
 # ---------------------------------------------------------------------------------------------
 
-# App layout
-# app.layout = html.Div([
-#
-# ])
+
+fig = px.scatter_mapbox(country_df, lat="Lat", lon="Long_", hover_name="Country_Region", hover_data=["Confirmed", "Deaths"],
+                        color_discrete_sequence=["fuchsia"])
+fig.update_layout(mapbox_style="open-street-map")
+fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
 
-#
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+app = dash.Dash(__name__)
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+# App layout (contains all the html components: the graphs, drop down, etc)
+app.layout = html.Div([
 
-app.layout = html.Div(children=[
-    html.H1(children='Hello Dash'),
+    html.H1("Web Application Dashboards with Dash",
+            style={'text-align': 'center'}),
 
-    html.Div(children='''
-        Dash: A web application framework for Python.
-    '''),
+    dcc.Graph(figure=fig)
 
-    dcc.Graph(
-        id='example-graph',
-        figure={
-            'data': [
-                {'x': [1, 2, 3], 'y': [4, 1, 2], 'type': 'bar', 'name': 'SF'},
-                {'x': [1, 2, 3], 'y': [2, 4, 5], 'type': 'bar', 'name': u'Montréal'},
-            ],
-            'layout': {
-                'title': 'Dash Data Visualization'
-            }
-        }
-    )
 ])
 
+
+# ------------------------------------------------------------------------------
+# Connect the Plotly graphs with Dash Components
+# @app.callback()
+
+
+# ---------------------------------------------------------------------------------------------
 if __name__ == '__main__':
     app.run_server(debug=True)
