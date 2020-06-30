@@ -9,7 +9,7 @@ Library for plots and dashboard.
 2. Install dependencies
 
 ```
-pip install -r
+pip install -r requirements.txt
 ```
 
 ## Building
