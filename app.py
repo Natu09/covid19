@@ -17,10 +17,7 @@ import plotly.graph_objects as go
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-
-# html embedding
-from IPython.display import Javascript
-from IPython.core.display import display, HTML
+import dash_bootstrap_components as dbc
 # ---------------------------------------------------------------------------------------------
 
 # Overwrite your CSS setting by including style locally
@@ -142,7 +139,7 @@ world_df = pd.DataFrame({
     'recovered': [total_recovered],
     'active': [total_confirmed - total_deaths - total_recovered]
 })
-print(world_df)
+# print(world_df)
 
 print("Here 6")
 
@@ -150,7 +147,7 @@ print("Here 6")
 word_long_df = world_df.melt(
     value_vars=['active', 'deaths', 'recovered'], var_name="status", value_name="count")
 word_long_df['upper'] = 'confirmed'
-print(word_long_df)
+# print(word_long_df)
 
 print("Here 7")
 
@@ -227,21 +224,33 @@ print("Here 14")
 #                          projection="natural earth",
 #                          title="COVID-19 worldwide confirmed cases over time")
 # fig_map.update_layout(
-#     plot_bgcolor=colors['background'],
-#     paper_bgcolor=colors['background'],
-#     font={
-#         'color': colors['text']
-#     }
+#     plot_bgcolor='rgb(45,45,45)',
+#     paper_bgcolor='rgb(45,45,45)',
+#     font_color=colors['text']
 # )
 
 print("Here 15")
 # Tree map
-fig_tree = px.treemap(word_long_df, path=[
-    "status"], title="Title", values="count", color_discrete_sequence=["blue", "red", "green"], template="seaborn")
+# fig_tree = px.treemap(word_long_df, path=[
+#     "status"], title="Title", values="count", color_discrete_sequence=["blue", "red", "green"], template="seaborn")
 
-# area chart
+# Area chart
 fig_area = px.area(temp, x="Date", y="Count", color='Case',
                    title='Cases over time', color_discrete_sequence=["green", "red", "blue"])
+fig_area.update_layout(
+    plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
+
+# Bar Chart
+# fig_bar = px.bar(temp, x="Date", y="Count", color='Case',
+#                  title='Cases over time', color_discrete_sequence=["green", "red", "blue"])
+# fig_bar.update_layout(
+#     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
+
+# print(covid_confirmed_agg_long)
+fig_line = px.line(covid_confirmed_agg_long, x="date", y="date_confirmed_cases", color="country",
+                   line_group="country", hover_name="country")
+fig_line.update_layout(
+    plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
 # ---------------------------------------------------------------------------------------------
 
@@ -250,12 +259,13 @@ external_stylesheets = ['https://codepen.io/anon/pen/mardKv.css',
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
+
 print("Here 16")
 
 # App layout (contains all the html components: the graphs, drop down, etc)
-app.layout = html.Div(
+app.layout = html.Div(children=[
     html.Div([
-        html.H1("COVID19 Web Application Dashboards",
+        html.H1("COVID19 Web Application",
                 style={
                     'textAlign': 'left',
                     'color': colors['text'],
@@ -265,27 +275,156 @@ app.layout = html.Div(
                 ),
     ], className="row"),
 
+    # # Top column display of confirmed, death and recovered total numbers
     html.Div([
         html.Div([
-            dcc.Graph(figure=fig_tree)
-            # dcc.Graph(figure=fig_map, className="eight columns"),
-        ]),
+            html.H4(children='Total Confirmed Cases: ',
+                    style={
+                        'textAlign': 'center',
+                        'color': colors['confirmed_text'],
+                    }
+                    ),
+            html.P(f"{total_confirmed}",
+                   style={
+                       'textAlign': 'center',
+                       'color': colors['confirmed_text'],
+                       'fontSize': 30,
+                   }
+                   ),
+            html.P('Past 24hrs increase: +' + f"{total_confirmed - worldwide_confirmed[-2]:,d}" + ' (' + str(round(((total_confirmed - worldwide_confirmed[-2])/total_confirmed)*100, 2)) + '%)',
+                   style={
+                       'textAlign': 'center',
+                       'color': colors['confirmed_text'],
+            }
+            ),
+        ],
+            style=divBorderStyle,
+            className='four columns',
+        ),
+        html.Div([
+            html.H4(children='Total Deceased: ',
+                    style={
+                        'textAlign': 'center',
+                        'color': colors['deaths_text'],
+                    }
+                    ),
+            html.P(f"{total_deaths}",
+                   style={
+                       'textAlign': 'center',
+                       'color': colors['deaths_text'],
+                       'fontSize': 30,
+                   }
+                   ),
+            html.P('Mortality Rate: ' + str(round(total_deaths/total_confirmed * 100, 3)) + '%',
+                   style={
+                       'textAlign': 'center',
+                       'color': colors['deaths_text'],
+            }
+            ),
+        ],
+            style=divBorderStyle,
+            className='four columns'),
+        html.Div([
+            html.H4(children='Total Recovered: ',
+                    style={
+                        'textAlign': 'center',
+                        'color': colors['recovered_text'],
+                    }
+                    ),
+            html.P(f"{total_recovered}",
+                   style={
+                       'textAlign': 'center',
+                       'color': colors['recovered_text'],
+                       'fontSize': 30,
+                   }
+                   ),
+            html.P('Recovery Rate: ' + str(round(total_confirmed/total_recovered * 100, 3)) + '%',
+                   style={
+                'textAlign': 'center',
+                'color': colors['recovered_text'],
+            }
+            ),
+        ],
+            style=divBorderStyle,
+            className='four columns'),
+    ], className='row'),
+
+
+    html.Div([
+
+        # html.Div([
+        #     dcc.Graph(figure=fig_map, style={
+        #         'display': 'flex',
+        #         'flex-direction': 'column',
+        #         'box-sizing': 'border-box',
+        #         'margin-left': 'auto',
+        #         'margin-right': 'auto',
+        #         'height': '70vh',
+        #         'padding': '0.75rem',
+        #         'color': colors['text'],
+        #         'backgroundColor': colors['background'],
+        #         'border-color': colors['background'],
+        #     },
+        #         className="eight columns"),
+        # ]),
+        html.Div([
+            dcc.Tabs([
+                dcc.Tab(label='Tab one', children=[
+                    dcc.Graph(figure=fig_area),
+                ], style={
+                    'color': colors['text'],
+                    'backgroundColor': colors['background'], }),
+                dcc.Tab(label='Tab two', children=[
+                    dcc.Graph(figure=fig_line),
+                ], style={
+                    'color': colors['text'],
+                    'backgroundColor':colors['background'], }),
+                dcc.Tab(label='Tab three', children=[
+                    dcc.Graph(figure=fig_area),
+                ], style={
+                    'color': colors['text'],
+                    'backgroundColor': colors['background'], }, ),
+            ], style={'padding-top': '2rem'},)
+        ], className="six columns"),
+
 
     ], className="row"),
 
+
     html.Div([
         html.Iframe(
+            style={
+                'display': 'flex',
+                'flex-direction': 'column',
+                'box-sizing': 'border-box',
+                'margin-left': 'auto',
+                'margin-right': 'auto',
+                'margin-top': 'auto',
+                'margin-bottom': 'auto',
+                'height': '70vh',
+                'padding-top': '10rem',
+                'padding': '0.75rem',
+                'color': colors['text'],
+                'backgroundColor': colors['background'],
+                'border-style': 'none',
+
+            },
             className="six columns",
-            style={'border': 'thin lightgrey solid', 'height': '100%'},
             srcDoc='''
                 <div class="flourish-embed flourish-bar-chart-race" data-src="visualisation/1571387">
                     <script src="https://public.flourish.studio/resources/embed.js"></script>
                 </div>
-                ''',
+                '''
         ),
-        dcc.Graph(figure=fig_area, className='six columns')
     ], className="row"),
-)
+
+], style={
+    'textAlign': 'left',
+    'color': colors['text'],
+    'backgroundColor': colors['background'],
+    'margin-top': '0',
+    'width': '100%'
+},)
 
 print("Here 17")
 # ------------------------------------------------------------------------------

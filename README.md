@@ -22,4 +22,4 @@ Run the following command from this directory:
 python3 app.py
 ```
 
-The geo plots take a quite bit of time, so it might take a few minutes to launch.
+The geo plots take a quite bit of time to load the data, so it might take a few minutes to launch.
