@@ -171,7 +171,7 @@ print("Here 9")
 
 world_rate_df['recovery rate'] = world_rate_df['recovered'] / \
     world_rate_df['confirmed'] * 100
-world_rate_df['mortality rate'] = world_rate_df['recovered'] / \
+world_rate_df['mortality rate'] = world_rate_df['deaths'] / \
     world_rate_df['confirmed'] * 100
 world_rate_df['date'] = world_rate_df.index
 
@@ -217,27 +217,36 @@ print("Here 13")
 # Visualizations
 print("Here 14")
 # World map
-# fig_map = px.scatter_geo(covid_confirmed_agg_long,
-#                          lat="Lat", lon="Long", color="country",
-#                          hover_name="country", size="date_confirmed_cases",
-#                          size_max=50, animation_frame="date",
-#                          projection="natural earth",
-#                          title="COVID-19 worldwide confirmed cases over time")
-# fig_map.update_layout(
-#     plot_bgcolor='rgb(45,45,45)',
-#     paper_bgcolor='rgb(45,45,45)',
-#     font_color=colors['text']
-# )
+fig_map = px.scatter_geo(covid_confirmed_agg_long,
+                         lat="Lat", lon="Long", color="country",
+                         hover_name="country", size="date_confirmed_cases",
+                         size_max=50, animation_frame="date",
+                         projection="natural earth",
+                         title="COVID-19 Worldwide Confirmed Cases Over Time")
+fig_map.update_layout(
+    margin={'l': 0, 'b': 0},
+    plot_bgcolor='rgb(45,45,45)',
+    paper_bgcolor='rgb(45,45,45)',
+    font_color=colors['text']
+)
 
 print("Here 15")
+# print(full_latest)
 # Tree map
-# fig_tree = px.treemap(word_long_df, path=[
-#     "status"], title="Title", values="count", color_discrete_sequence=["blue", "red", "green"], template="seaborn")
+full_latest["world"] = "world"
+fig_tree = px.treemap(full_latest, path=[
+    "world", "Country/Region", "Province/State"], title="Total Number of Confirmed Cases", values="Confirmed", color_discrete_sequence=px.colors.qualitative.Prism, template="seaborn")
+fig_tree.data[0].textinfo = 'label+text+value'
+fig_tree.update_layout(
+    margin={'t': 50, 'l': 0, 'r': 0, 'b': 0},
+    plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
+
 
 # Area chart
 fig_area = px.area(temp, x="Date", y="Count", color='Case',
-                   title='Cases over time', color_discrete_sequence=["green", "red", "blue"])
+                   title='Evolution of Cases Status', color_discrete_sequence=["green", "red", "blue"])
 fig_area.update_layout(
+    margin={'l': 0, 'r': 0, 'b': 0},
     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
 # Bar Chart
@@ -247,10 +256,12 @@ fig_area.update_layout(
 #     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
 # print(covid_confirmed_agg_long)
-fig_line = px.line(covid_confirmed_agg_long, x="date", y="date_confirmed_cases", color="country",
+fig_line = px.line(covid_confirmed_agg_long, x="date", y="date_confirmed_cases", title="Evolution of Cases Over Time", color="country",
                    line_group="country", hover_name="country")
 fig_line.update_layout(
+    margin={'l': 0, 'r': 0, 'b': 0},
     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
+
 
 # ---------------------------------------------------------------------------------------------
 
@@ -338,7 +349,7 @@ app.layout = html.Div(children=[
                        'fontSize': 30,
                    }
                    ),
-            html.P('Recovery Rate: ' + str(round(total_confirmed/total_recovered * 100, 3)) + '%',
+            html.P('Recovery Rate: ' + str(round(worldwide_recovered[-1]/worldwide_confirmed[-1] * 100, 3)) + '%',
                    style={
                 'textAlign': 'center',
                 'color': colors['recovered_text'],
@@ -351,47 +362,56 @@ app.layout = html.Div(children=[
 
 
     html.Div([
+        html.Div([
+            dcc.Graph(figure=fig_map, style={
+                'display': 'flex',
+                'flex-direction': 'column',
+                'box-sizing': 'border-box',
+                'margin-left': 'auto',
+                'margin-right': 'auto',
+                'height': '70vh',
+                'padding': '0.75rem',
+                'textAlign': 'center',
+                'color': colors['text'],
+                'backgroundColor': colors['background'],
+                'border-color': colors['background'],
+            },
+                className="twelve columns"),
+        ], style={
+            'textAlign': 'center',
+            'color': colors['text'],
+            'backgroundColor': colors['background'],
+        }),
 
-        # html.Div([
-        #     dcc.Graph(figure=fig_map, style={
-        #         'display': 'flex',
-        #         'flex-direction': 'column',
-        #         'box-sizing': 'border-box',
-        #         'margin-left': 'auto',
-        #         'margin-right': 'auto',
-        #         'height': '70vh',
-        #         'padding': '0.75rem',
-        #         'color': colors['text'],
-        #         'backgroundColor': colors['background'],
-        #         'border-color': colors['background'],
-        #     },
-        #         className="eight columns"),
-        # ]),
+
+    ], style={
+        'textAlign': 'center',
+        'color': colors['text'],
+        'backgroundColor': colors['background'],
+    }, className="row"),
+
+
+    html.Div([
         html.Div([
             dcc.Tabs([
-                dcc.Tab(label='Tab one', children=[
+                dcc.Tab(label='Cases by Status', children=[
                     dcc.Graph(figure=fig_area),
                 ], style={
                     'color': colors['text'],
                     'backgroundColor': colors['background'], }),
-                dcc.Tab(label='Tab two', children=[
+                dcc.Tab(label='Cases by Time', children=[
                     dcc.Graph(figure=fig_line),
                 ], style={
                     'color': colors['text'],
                     'backgroundColor':colors['background'], }),
-                dcc.Tab(label='Tab three', children=[
-                    dcc.Graph(figure=fig_area),
+                dcc.Tab(label='Cases by Country', children=[
+                    dcc.Graph(figure=fig_tree),
                 ], style={
                     'color': colors['text'],
                     'backgroundColor': colors['background'], }, ),
             ], style={'padding-top': '2rem'},)
         ], className="six columns"),
 
-
-    ], className="row"),
-
-
-    html.Div([
         html.Iframe(
             style={
                 'display': 'flex',
@@ -401,7 +421,7 @@ app.layout = html.Div(children=[
                 'margin-right': 'auto',
                 'margin-top': 'auto',
                 'margin-bottom': 'auto',
-                'height': '70vh',
+                'height': '60vh',
                 'padding-top': '10rem',
                 'padding': '0.75rem',
                 'color': colors['text'],
