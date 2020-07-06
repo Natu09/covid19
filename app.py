@@ -219,18 +219,18 @@ print("Here 13")
 # Visualizations
 print("Here 14")
 # World map
-# fig_map = px.scatter_geo(covid_confirmed_agg_long,
-#                          lat="Lat", lon="Long", color="country",
-#                          hover_name="country", size="date_confirmed_cases",
-#                          size_max=50, animation_frame="date",
-#                          projection="natural earth",
-#                          title="COVID-19 Worldwide Confirmed Cases Over Time")
-# fig_map.update_layout(
-#     margin={'t': 30, 'l': 0, 'r': 0, 'b': 0},
-#     plot_bgcolor=colors['background'],
-#     paper_bgcolor=colors['background'],
-#     font_color=colors['text']
-# )
+fig_map = px.scatter_geo(covid_confirmed_agg_long,
+                         lat="Lat", lon="Long", color="country",
+                         hover_name="country", size="date_confirmed_cases",
+                         size_max=50, animation_frame="date",
+                         projection="natural earth",
+                         title="COVID-19 Worldwide Confirmed Cases Over Time")
+fig_map.update_layout(
+    margin={'t': 30, 'l': 0, 'r': 0, 'b': 0},
+    plot_bgcolor=colors['background'],
+    paper_bgcolor=colors['background'],
+    font_color=colors['text']
+)
 
 print("Here 15")
 # print(full_latest)
@@ -302,12 +302,14 @@ app.layout = html.Div(children=[
                     html.Hr(),
                     dbc.ModalBody(
                         "SARS-CoV-2, better known as COVID-19 (coronavirus disease 2019) is a viral \
-                            infectious disease and is currently a World Health Organization (WHO) declared pandemic."
+                            infectious disease and is currently a World Health Organization (WHO) declared pandemic. \
+                                Having now killed over half a million people, this novel coronavirus that was first detected in Wuhan China, has now spread to over \
+                                    200 locations internationally. "
                     ),
                     html.Br(),
                     dbc.ModalBody(
-                        "This web application intends to serve as an informative guide around the numbers \
-                            and a more intuitive way to understand them."
+                        "This web application intends to serve as an informative guide around the novel \
+                            coronavirus. This"
                     ),
                     html.Hr(),
                     dbc.ModalFooter(
@@ -425,26 +427,26 @@ app.layout = html.Div(children=[
 
 
     html.Div([
-        # html.Div([
-        #     dcc.Graph(figure=fig_map, style={
-        #         'display': 'flex',
-        #         'flex-direction': 'column',
-        #         'box-sizing': 'border-box',
-        #         # 'margin-left': 'auto',
-        #         # 'margin-right': 'auto',
-        #         'height': '70vh',
-        #         'padding': '0.75rem',
-        #         'textAlign': 'center',
-        #         'color': colors['text'],
-        #         'backgroundColor': colors['background'],
-        #         'border-color': colors['background'],
-        #     },
-        #         className="twelve columns"),
-        # ], style={
-        #     'textAlign': 'center',
-        #     'color': colors['text'],
-        #     'backgroundColor': colors['background'],
-        # }),
+        html.Div([
+            dcc.Graph(figure=fig_map, style={
+                'display': 'flex',
+                'flex-direction': 'column',
+                'box-sizing': 'border-box',
+                # 'margin-left': 'auto',
+                # 'margin-right': 'auto',
+                'height': '70vh',
+                'padding': '0.75rem',
+                'textAlign': 'center',
+                'color': colors['text'],
+                'backgroundColor': colors['background'],
+                'border-color': colors['background'],
+            },
+                className="twelve columns"),
+        ], style={
+            'textAlign': 'center',
+            'color': colors['text'],
+            'backgroundColor': colors['background'],
+        }),
 
     ], className="row"),
 
