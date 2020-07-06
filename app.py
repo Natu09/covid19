@@ -18,6 +18,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+from dash.dependencies import Input, Output, State
 # ---------------------------------------------------------------------------------------------
 
 # Overwrite your CSS setting by including style locally
@@ -29,7 +30,7 @@ colors = {
     'deaths_text': '#f44336',
     'recovered_text': '#5A9E6F',
     'highest_case_bg': '#393939',
-
+    'active_text': '#ffa500',
 }
 
 # Creating custom style for local use
@@ -109,7 +110,7 @@ print("Here 2")
 # rename
 confirmed_df = confirmed_df.rename(columns={'Country/Region': 'country'})
 death_df = death_df.rename(columns={'Country/Region': 'country'})
-recovered_df = death_df.rename(columns={'Country/Region': 'country'})
+recovered_df = recovered_df.rename(columns={'Country/Region': 'country'})
 
 print("Here 3")
 
@@ -128,6 +129,7 @@ print("Here 4")
 total_confirmed = confirmed_df.iloc[:, 4:].sum().max()
 total_deaths = death_df.iloc[:, 4:].sum().max()
 total_recovered = recovered_df.iloc[:, 4:].sum().max()
+total_active = total_confirmed - (total_deaths + total_recovered)
 # print(total_confirmed, total_deaths, total_recovered)
 
 print("Here 5")
@@ -174,7 +176,7 @@ world_rate_df['recovery rate'] = world_rate_df['recovered'] / \
 world_rate_df['mortality rate'] = world_rate_df['deaths'] / \
     world_rate_df['confirmed'] * 100
 world_rate_df['date'] = world_rate_df.index
-
+# print(world_rate_df)
 print("Here 10")
 
 # unpivot the dataframe from wide to long format
@@ -217,18 +219,18 @@ print("Here 13")
 # Visualizations
 print("Here 14")
 # World map
-fig_map = px.scatter_geo(covid_confirmed_agg_long,
-                         lat="Lat", lon="Long", color="country",
-                         hover_name="country", size="date_confirmed_cases",
-                         size_max=50, animation_frame="date",
-                         projection="natural earth",
-                         title="COVID-19 Worldwide Confirmed Cases Over Time")
-fig_map.update_layout(
-    margin={'l': 0, 'b': 0},
-    plot_bgcolor='rgb(45,45,45)',
-    paper_bgcolor='rgb(45,45,45)',
-    font_color=colors['text']
-)
+# fig_map = px.scatter_geo(covid_confirmed_agg_long,
+#                          lat="Lat", lon="Long", color="country",
+#                          hover_name="country", size="date_confirmed_cases",
+#                          size_max=50, animation_frame="date",
+#                          projection="natural earth",
+#                          title="COVID-19 Worldwide Confirmed Cases Over Time")
+# fig_map.update_layout(
+#     margin={'t': 30, 'l': 0, 'r': 0, 'b': 0},
+#     plot_bgcolor=colors['background'],
+#     paper_bgcolor=colors['background'],
+#     font_color=colors['text']
+# )
 
 print("Here 15")
 # print(full_latest)
@@ -284,6 +286,43 @@ app.layout = html.Div(children=[
                 },
                 className='ten columns',
                 ),
+        html.Div([
+            dbc.Button("MORE INFO", id="open", className="fa fa-info-circle",
+                       style={
+                           'color': colors['text'],
+                           'backgroundColor': colors['background'],
+                       }),
+            dbc.Modal(
+                [
+                    html.Div([
+                        dbc.ModalHeader(
+                            "Dataset provided by Johns Hopkins University Center for Systems Science and Engineering (JHU CSSE):"),
+                        html.A("https://systems.jhu.edu/"),
+                    ], style={'textAlign': 'center'}),
+                    html.Hr(),
+                    dbc.ModalBody(
+                        "SARS-CoV-2, better known as COVID-19 (coronavirus disease 2019) is a viral \
+                            infectious disease and is currently a World Health Organization (WHO) declared pandemic."
+                    ),
+                    html.Br(),
+                    dbc.ModalBody(
+                        "This web application intends to serve as an informative guide around the numbers \
+                            and a more intuitive way to understand them."
+                    ),
+                    html.Hr(),
+                    dbc.ModalFooter(
+                        dbc.Button("Close", id="close", className="ml-auto", style={
+                            'color': colors['text'],
+                            'backgroundColor': colors['background'],
+                        })
+                    ),
+                ],
+                id="modal", className="six columns offset-by-three",
+            ),
+        ], style={
+            'color': colors['text'],
+            'backgroundColor': colors['background'],
+        }),
     ], className="row"),
 
     # # Top column display of confirmed, death and recovered total numbers
@@ -295,7 +334,7 @@ app.layout = html.Div(children=[
                         'color': colors['confirmed_text'],
                     }
                     ),
-            html.P(f"{total_confirmed}",
+            html.P(f"{total_confirmed:,d}",
                    style={
                        'textAlign': 'center',
                        'color': colors['confirmed_text'],
@@ -310,7 +349,7 @@ app.layout = html.Div(children=[
             ),
         ],
             style=divBorderStyle,
-            className='four columns',
+            className='three columns',
         ),
         html.Div([
             html.H4(children='Total Deceased: ',
@@ -319,7 +358,7 @@ app.layout = html.Div(children=[
                         'color': colors['deaths_text'],
                     }
                     ),
-            html.P(f"{total_deaths}",
+            html.P(f"{total_deaths:,d}",
                    style={
                        'textAlign': 'center',
                        'color': colors['deaths_text'],
@@ -334,7 +373,31 @@ app.layout = html.Div(children=[
             ),
         ],
             style=divBorderStyle,
-            className='four columns'),
+            className='three columns'),
+        html.Div([
+            html.H4(children='Total Active: ',
+                    style={
+                        'textAlign': 'center',
+                        'color': colors['active_text'],
+                    }
+                    ),
+            html.P(f"{total_active:,d}",
+                   style={
+                       'textAlign': 'center',
+                       'color': colors['active_text'],
+                       'fontSize': 30,
+                   }
+                   ),
+            html.P('Past 24hrs increase: +' + f"{total_active - worldwide_active[-2]:,d}" + ' (' + str(round(((total_active - worldwide_active[-2])/total_active)*100, 2)) + '%)',
+                   style={
+                'textAlign': 'center',
+                       'color': colors['active_text'],
+            }
+            ),
+        ],
+            style=divBorderStyle,
+            className='three columns',
+        ),
         html.Div([
             html.H4(children='Total Recovered: ',
                     style={
@@ -342,7 +405,7 @@ app.layout = html.Div(children=[
                         'color': colors['recovered_text'],
                     }
                     ),
-            html.P(f"{total_recovered}",
+            html.P(f"{total_recovered:,d}",
                    style={
                        'textAlign': 'center',
                        'color': colors['recovered_text'],
@@ -357,38 +420,33 @@ app.layout = html.Div(children=[
             ),
         ],
             style=divBorderStyle,
-            className='four columns'),
+            className='three columns'),
     ], className='row'),
 
 
     html.Div([
-        html.Div([
-            dcc.Graph(figure=fig_map, style={
-                'display': 'flex',
-                'flex-direction': 'column',
-                'box-sizing': 'border-box',
-                'margin-left': 'auto',
-                'margin-right': 'auto',
-                'height': '70vh',
-                'padding': '0.75rem',
-                'textAlign': 'center',
-                'color': colors['text'],
-                'backgroundColor': colors['background'],
-                'border-color': colors['background'],
-            },
-                className="twelve columns"),
-        ], style={
-            'textAlign': 'center',
-            'color': colors['text'],
-            'backgroundColor': colors['background'],
-        }),
+        # html.Div([
+        #     dcc.Graph(figure=fig_map, style={
+        #         'display': 'flex',
+        #         'flex-direction': 'column',
+        #         'box-sizing': 'border-box',
+        #         # 'margin-left': 'auto',
+        #         # 'margin-right': 'auto',
+        #         'height': '70vh',
+        #         'padding': '0.75rem',
+        #         'textAlign': 'center',
+        #         'color': colors['text'],
+        #         'backgroundColor': colors['background'],
+        #         'border-color': colors['background'],
+        #     },
+        #         className="twelve columns"),
+        # ], style={
+        #     'textAlign': 'center',
+        #     'color': colors['text'],
+        #     'backgroundColor': colors['background'],
+        # }),
 
-
-    ], style={
-        'textAlign': 'center',
-        'color': colors['text'],
-        'backgroundColor': colors['background'],
-    }, className="row"),
+    ], className="row"),
 
 
     html.Div([
@@ -450,6 +508,17 @@ print("Here 17")
 # ------------------------------------------------------------------------------
 # Connect the Plotly graphs with Dash Components
 # @app.callback()
+
+
+@app.callback(
+    Output("modal", "is_open"),
+    [Input("open", "n_clicks"), Input("close", "n_clicks")],
+    [State("modal", "is_open")],
+)
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
 
 
 # ---------------------------------------------------------------------------------------------
