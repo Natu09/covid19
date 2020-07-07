@@ -2,8 +2,8 @@
 __author__ = "Nathaniel Habtegergesa"
 
 """
-Dataset location:
-    https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series
+Dataset:
+    https://systems.jhu.edu/ 
 """
 
 # ---------------------------------------------------------------------------------------------
@@ -219,18 +219,18 @@ print("Here 13")
 # Visualizations
 print("Here 14")
 # World map
-fig_map = px.scatter_geo(covid_confirmed_agg_long,
-                         lat="Lat", lon="Long", color="country",
-                         hover_name="country", size="date_confirmed_cases",
-                         size_max=50, animation_frame="date",
-                         projection="natural earth",
-                         title="COVID-19 Worldwide Confirmed Cases Over Time")
-fig_map.update_layout(
-    margin={'t': 30, 'l': 0, 'r': 0, 'b': 0},
-    plot_bgcolor=colors['background'],
-    paper_bgcolor=colors['background'],
-    font_color=colors['text']
-)
+# fig_map = px.scatter_geo(covid_confirmed_agg_long,
+#                          lat="Lat", lon="Long", color="country",
+#                          hover_name="country", size="date_confirmed_cases",
+#                          size_max=50, animation_frame="date",
+#                          projection="natural earth",
+#                          title="COVID-19 Worldwide Confirmed Cases Over Time")
+# fig_map.update_layout(
+#     margin={'t': 30, 'l': 0, 'r': 0, 'b': 0},
+#     plot_bgcolor=colors['background'],
+#     paper_bgcolor=colors['background'],
+#     font_color=colors['text']
+# )
 
 print("Here 15")
 # print(full_latest)
@@ -243,7 +243,7 @@ fig_tree.update_layout(
     margin={'t': 50, 'l': 0, 'r': 0, 'b': 0},
     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
-
+print(temp)
 # Area chart
 fig_area = px.area(temp, x="Date", y="Count", color='Case',
                    title='Evolution of Cases Status', color_discrete_sequence=["green", "red", "blue"])
@@ -330,7 +330,7 @@ app.layout = html.Div(children=[
     # # Top column display of confirmed, death and recovered total numbers
     html.Div([
         html.Div([
-            html.H4(children='Total Confirmed Cases: ',
+            html.H4(children='Total Confirmed: ',
                     style={
                         'textAlign': 'center',
                         'color': colors['confirmed_text'],
@@ -428,20 +428,20 @@ app.layout = html.Div(children=[
 
     html.Div([
         html.Div([
-            dcc.Graph(figure=fig_map, style={
-                'display': 'flex',
-                'flex-direction': 'column',
-                'box-sizing': 'border-box',
-                # 'margin-left': 'auto',
-                # 'margin-right': 'auto',
-                'height': '70vh',
-                'padding': '0.75rem',
-                'textAlign': 'center',
-                'color': colors['text'],
-                'backgroundColor': colors['background'],
-                'border-color': colors['background'],
-            },
-                className="twelve columns"),
+            # dcc.Graph(figure=fig_map, style={
+            #     'display': 'flex',
+            #     'flex-direction': 'column',
+            #     'box-sizing': 'border-box',
+            #     # 'margin-left': 'auto',
+            #     # 'margin-right': 'auto',
+            #     'height': '70vh',
+            #     'padding': '0.75rem',
+            #     'textAlign': 'center',
+            #     'color': colors['text'],
+            #     'backgroundColor': colors['background'],
+            #     'border-color': colors['background'],
+            # },
+            #     className="twelve columns"),
         ], style={
             'textAlign': 'center',
             'color': colors['text'],
@@ -455,6 +455,42 @@ app.layout = html.Div(children=[
         html.Div([
             dcc.Tabs([
                 dcc.Tab(label='Cases by Status', children=[
+                    html.Div([
+                        html.Div([
+                            html.Label(['X-axis categories to compare:'],
+                                       style={'font-weight': 'bold'}),
+                            dcc.RadioItems(
+                                id='xaxis_raditem',
+                                options=[
+                                    {'label': 'Cumulative',
+                                     'value': 'Cumulative'},
+                                    {'label': 'Instantaneous',
+                                     'value': 'Instantaneous'},
+                                ],
+                                value='Cumulative',
+                                style={"width": "50%"}
+                            ),
+                        ], className="six columns"),
+
+                        html.Div([
+                            html.Div([
+                                html.Label(['Y-axis values to compare:'],
+                                           style={'font-weight': 'bold'}),
+                                dcc.RadioItems(
+                                    id='yaxis_raditem',
+                                    options=[
+                                        {'label': 'Linear',
+                                         'value': 'Linear'},
+                                        {'label': 'Semi-log',
+                                         'value': 'Semi-log'},
+                                    ],
+                                    value='Linear',
+                                    style={"width": "50%"}
+                                ),
+                            ], style={'float': 'right'}),
+                        ], className="six columns"),
+                    ], className="row"),
+
                     dcc.Graph(figure=fig_area),
                 ], style={
                     'color': colors['text'],
@@ -521,6 +557,32 @@ def toggle_modal(n1, n2, is_open):
     if n1 or n2:
         return not is_open
     return is_open
+
+# @app.callback(
+#     Output(component_id='the_graph', component_property='figure'),
+#     [Input(component_id='xaxis_raditem', component_property='value'),
+#      Input(component_id='yaxis_raditem', component_property='value')]
+# )
+
+# def update_graph(x_axis, y_axis):
+
+#     dff = mydataset for the graph im using
+#     # print(dff[[x_axis,y_axis]][:1])
+
+#     barchart=px.bar(
+#             data_frame=dff,
+#             x=x_axis,
+#             y=y_axis,
+#             title=y_axis+': by '+x_axis,
+#             # facet_col='Borough',
+#             # color='Borough',
+#             # barmode='group',
+#             )
+
+#     barchart.update_layout(xaxis={'categoryorder':'total ascending'},
+#                            title={'xanchor':'center', 'yanchor': 'top', 'y':0.9,'x':0.5,})
+
+#     return (barchart)
 
 
 # ---------------------------------------------------------------------------------------------
