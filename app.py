@@ -97,9 +97,10 @@ temp = full_table.groupby(
     'Date')['Recovered', 'Deaths', 'Active'].sum().reset_index()
 temp = temp.melt(id_vars="Date", value_vars=['Recovered', 'Deaths', 'Active'],
                  var_name='Case', value_name='Count')
-print(temp)
+# print(temp)
 
 # create extra columns for radio buttons
+temp["Date2"] = temp["Date"]
 
 print("Here 1")
 
@@ -311,7 +312,7 @@ app.layout = html.Div(children=[
                     html.Br(),
                     dbc.ModalBody(
                         "This web application intends to serve as an informative guide around the novel \
-                            coronavirus. This"
+                            coronavirus. This was done using Python, ... (to be continued)"
                     ),
                     html.Hr(),
                     dbc.ModalFooter(
@@ -435,7 +436,7 @@ app.layout = html.Div(children=[
             #     'flex-direction': 'column',
             #     'box-sizing': 'border-box',
             #     # 'margin-left': 'auto',
-            #     # 'margin-right': 'auto',
+            #     # 'margin-righ    t': 'auto',
             #     'height': '70vh',
             #     'padding': '0.75rem',
             #     'textAlign': 'center',
@@ -467,7 +468,7 @@ app.layout = html.Div(children=[
                                     {'label': 'Cumulative',
                                      'value': 'Date'},
                                     {'label': 'Instantaneous',
-                                     'value': 'Date'},
+                                     'value': 'Date2'},
                                 ],
                                 value='Date',
                                 style={"width": "50%"}
@@ -569,33 +570,65 @@ def toggle_modal(n1, n2, is_open):
      Input(component_id='yaxis_raditem', component_property='value')]
 )
 def update_graph(x_axis, y_axis):
-
     dff = temp
-    # print(dff[[x_axis,y_axis]][:1])
+    dff2 = full_table.groupby(
+        'Date')['Recovered', 'Deaths', 'Active'].sum().diff()
+    dff2 = dff2.reset_index()
+    dff2 = dff2.melt(id_vars="Date",
+                     value_vars=['Recovered', 'Deaths', 'Active'])
+    if x_axis == "Date":
+        fig = px.area(
+            data_frame=dff,
+            x=x_axis,
+            y=y_axis,
+            title=y_axis+': by '+x_axis,
+            color='Case',
+            color_discrete_sequence=["green", "red", "#ffa500"],
+        )
 
-    fig = px.area(
-        data_frame=dff,
-        x=x_axis,
-        y=y_axis,
-        title=y_axis+': by '+x_axis,
-        color='Case',
-        color_discrete_sequence=["green", "red", "blue"],
-        # facet_col='Borough',
-        # color='Borough',
-        # barmode='group',
-    )
+        fig.update_layout(
+            xaxis={'categoryorder': 'total ascending'},
+            title={'xanchor': 'center',
+                   'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
+            margin={'l': 0, 'r': 0, 'b': 0},
+            plot_bgcolor=colors['background'],
+            paper_bgcolor=colors['background'],
+            font_color=colors['text']
+        ),
 
-    fig.update_layout(
-        xaxis={'categoryorder': 'total ascending'},
-        title={'xanchor': 'center',
-               'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
-        margin={'l': 0, 'r': 0, 'b': 0},
-        plot_bgcolor=colors['background'],
-        paper_bgcolor=colors['background'],
-        font_color=colors['text']
-    ),
+    else:
+        fig = px.bar(dff2, x="Date", y="value", color='variable',
+                     title=y_axis+': by '+x_axis,
+                     color_discrete_sequence=["green", "red", "#ffa500"])
+        fig.update_layout(barmode='group')
+        fig.update_layout(
+            xaxis={'categoryorder': 'total ascending'},
+            title={'xanchor': 'center',
+                   'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
+            margin={'l': 0, 'r': 0, 'b': 0},
+            plot_bgcolor=colors['background'],
+            paper_bgcolor=colors['background'],
+            font_color=colors['text'],
+        )
 
-    return (fig)
+        # fig = px.bar(
+        #     data_frame=dff2,
+        #     x="Date",
+        #     y="value",
+        #     title=y_axis+': by '+x_axis,
+        #     color='variable',
+        #     color_discrete_sequence=["green", "red", "#ffa500"],
+        # ),
+        # fig.update_layout(barmode='group'),
+        # fig.update_layout(
+        #     title={'xanchor': 'center',
+        #            'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
+        #     margin={'l': 0, 'r': 0, 'b': 0},
+        #     plot_bgcolor=colors['background'],
+        #     paper_bgcolor=colors['background'],
+        #     font_color=colors['text'],
+        # ),
+    return fig
 
 
 # ---------------------------------------------------------------------------------------------
