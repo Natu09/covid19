@@ -485,7 +485,7 @@ app.layout = html.Div(children=[
                                         {'label': 'Linear',
                                          'value': 'Count'},
                                         {'label': 'Semi-log',
-                                         'value': 'Count'},
+                                         'value': 'Count2'},
                                     ],
                                     value='Count',
                                     style={"width": "50%"}
@@ -577,57 +577,74 @@ def update_graph(x_axis, y_axis):
     dff2 = dff2.melt(id_vars="Date",
                      value_vars=['Recovered', 'Deaths', 'Active'])
     if x_axis == "Date":
-        fig = px.area(
-            data_frame=dff,
-            x=x_axis,
-            y=y_axis,
-            title=y_axis+': by '+x_axis,
-            color='Case',
-            color_discrete_sequence=["green", "red", "#ffa500"],
-        )
+        if y_axis == "Count":
+            fig = px.area(
+                data_frame=dff,
+                x=x_axis,
+                y=y_axis,
+                title=y_axis+': by '+x_axis,
+                color='Case',
+                color_discrete_sequence=["green", "red", "#ffa500"],
+            )
 
-        fig.update_layout(
-            xaxis={'categoryorder': 'total ascending'},
-            title={'xanchor': 'center',
-                   'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
-            margin={'l': 0, 'r': 0, 'b': 0},
-            plot_bgcolor=colors['background'],
-            paper_bgcolor=colors['background'],
-            font_color=colors['text']
-        ),
+            fig.update_layout(
+                xaxis={'categoryorder': 'total ascending'},
+                title={'xanchor': 'center',
+                       'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
+                margin={'l': 0, 'r': 0, 'b': 0},
+                plot_bgcolor=colors['background'],
+                paper_bgcolor=colors['background'],
+                font_color=colors['text']
+            ),
+        else:
+            fig = px.area(
+                data_frame=dff,
+                x=x_axis,
+                y="Count",
+                title=y_axis+': by '+x_axis,
+                color='Case',
+                color_discrete_sequence=["green", "red", "#ffa500"],
+            )
 
+            fig.update_layout(
+                yaxis_type="log",
+                xaxis={'categoryorder': 'total ascending'},
+                title={'xanchor': 'center',
+                       'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
+                margin={'l': 0, 'r': 0, 'b': 0},
+                plot_bgcolor=colors['background'],
+                paper_bgcolor=colors['background'],
+                font_color=colors['text']
+            ),
     else:
-        fig = px.bar(dff2, x="Date", y="value", color='variable',
-                     title=y_axis+': by '+x_axis,
-                     color_discrete_sequence=["green", "red", "#ffa500"])
-        fig.update_layout(barmode='group')
-        fig.update_layout(
-            xaxis={'categoryorder': 'total ascending'},
-            title={'xanchor': 'center',
-                   'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
-            margin={'l': 0, 'r': 0, 'b': 0},
-            plot_bgcolor=colors['background'],
-            paper_bgcolor=colors['background'],
-            font_color=colors['text'],
-        )
-
-        # fig = px.bar(
-        #     data_frame=dff2,
-        #     x="Date",
-        #     y="value",
-        #     title=y_axis+': by '+x_axis,
-        #     color='variable',
-        #     color_discrete_sequence=["green", "red", "#ffa500"],
-        # ),
-        # fig.update_layout(barmode='group'),
-        # fig.update_layout(
-        #     title={'xanchor': 'center',
-        #            'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
-        #     margin={'l': 0, 'r': 0, 'b': 0},
-        #     plot_bgcolor=colors['background'],
-        #     paper_bgcolor=colors['background'],
-        #     font_color=colors['text'],
-        # ),
+        if y_axis == "Count":
+            fig = px.bar(dff2, x="Date", y="value", color='variable',
+                         title=y_axis+': by '+x_axis,
+                         color_discrete_sequence=["green", "red", "#ffa500"])
+            fig.update_layout(barmode='group')
+            fig.update_layout(
+                xaxis={'categoryorder': 'total ascending'},
+                title={'xanchor': 'center',
+                       'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
+                margin={'l': 0, 'r': 0, 'b': 0},
+                plot_bgcolor=colors['background'],
+                paper_bgcolor=colors['background'],
+                font_color=colors['text'],
+            )
+        else:
+            fig = px.bar(dff2, x="Date", y="value", color='variable',
+                         title=y_axis+': by '+x_axis,
+                         color_discrete_sequence=["green", "red", "#ffa500"])
+            fig.update_layout(barmode='group', yaxis_type="log")
+            fig.update_layout(
+                xaxis={'categoryorder': 'total ascending'},
+                title={'xanchor': 'center',
+                       'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
+                margin={'l': 0, 'r': 0, 'b': 0},
+                plot_bgcolor=colors['background'],
+                paper_bgcolor=colors['background'],
+                font_color=colors['text'],
+            )
     return fig
 
 
