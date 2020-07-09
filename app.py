@@ -97,6 +97,9 @@ temp = full_table.groupby(
     'Date')['Recovered', 'Deaths', 'Active'].sum().reset_index()
 temp = temp.melt(id_vars="Date", value_vars=['Recovered', 'Deaths', 'Active'],
                  var_name='Case', value_name='Count')
+print(temp)
+
+# create extra columns for radio buttons
 
 print("Here 1")
 
@@ -243,13 +246,12 @@ fig_tree.update_layout(
     margin={'t': 50, 'l': 0, 'r': 0, 'b': 0},
     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
-print(temp)
 # Area chart
-fig_area = px.area(temp, x="Date", y="Count", color='Case',
-                   title='Evolution of Cases Status', color_discrete_sequence=["green", "red", "blue"])
-fig_area.update_layout(
-    margin={'l': 0, 'r': 0, 'b': 0},
-    plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
+# fig_area = px.area(temp, x="Date", y="Count", color='Case',
+#                    title='Evolution of Cases Status', color_discrete_sequence=["green", "red", "blue"])
+# fig_area.update_layout(
+#     margin={'l': 0, 'r': 0, 'b': 0},
+#     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
 # Bar Chart
 # fig_bar = px.bar(temp, x="Date", y="Count", color='Case',
@@ -463,11 +465,11 @@ app.layout = html.Div(children=[
                                 id='xaxis_raditem',
                                 options=[
                                     {'label': 'Cumulative',
-                                     'value': 'Cumulative'},
+                                     'value': 'Date'},
                                     {'label': 'Instantaneous',
-                                     'value': 'Instantaneous'},
+                                     'value': 'Date'},
                                 ],
-                                value='Cumulative',
+                                value='Date',
                                 style={"width": "50%"}
                             ),
                         ], className="six columns"),
@@ -480,18 +482,19 @@ app.layout = html.Div(children=[
                                     id='yaxis_raditem',
                                     options=[
                                         {'label': 'Linear',
-                                         'value': 'Linear'},
+                                         'value': 'Count'},
                                         {'label': 'Semi-log',
-                                         'value': 'Semi-log'},
+                                         'value': 'Count'},
                                     ],
-                                    value='Linear',
+                                    value='Count',
                                     style={"width": "50%"}
                                 ),
                             ], style={'float': 'right'}),
                         ], className="six columns"),
                     ], className="row"),
 
-                    dcc.Graph(figure=fig_area),
+                    dcc.Graph(id='the_graph'),
+                    # dcc.Graph(figure=fig_area),
                 ], style={
                     'color': colors['text'],
                     'backgroundColor': colors['background'], }),
@@ -508,30 +511,31 @@ app.layout = html.Div(children=[
             ], style={'padding-top': '2rem'},)
         ], className="six columns"),
 
-        html.Iframe(
-            style={
-                'display': 'flex',
-                'flex-direction': 'column',
-                'box-sizing': 'border-box',
-                'margin-left': 'auto',
-                'margin-right': 'auto',
-                'margin-top': 'auto',
-                'margin-bottom': 'auto',
-                'height': '60vh',
-                'padding-top': '10rem',
-                'padding': '0.75rem',
-                'color': colors['text'],
-                'backgroundColor': colors['background'],
-                'border-style': 'none',
+        html.Div([
+            html.Iframe(
+                style={
+                    # 'display': 'block',
+                    # 'flex-direction': 'column',
+                    # 'box-sizing': 'border-box',
+                    # 'margin': 'auto',
+                    'height': '100vh',
+                    'width': '100%',
+                    # 'padding-top': '10rem',
+                    # 'padding': '0.75rem',
+                    'color': colors['text'],
+                    'backgroundColor': colors['background'],
+                    'border-style': 'none',
 
-            },
-            className="six columns",
-            srcDoc='''
+                },
+                # className="row",
+                srcDoc='''
                 <div class="flourish-embed flourish-bar-chart-race" data-src="visualisation/1571387">
                     <script src="https://public.flourish.studio/resources/embed.js"></script>
                 </div>
                 '''
-        ),
+            ),
+        ], className="six columns"),
+
     ], className="row"),
 
 ], style={
@@ -558,31 +562,40 @@ def toggle_modal(n1, n2, is_open):
         return not is_open
     return is_open
 
-# @app.callback(
-#     Output(component_id='the_graph', component_property='figure'),
-#     [Input(component_id='xaxis_raditem', component_property='value'),
-#      Input(component_id='yaxis_raditem', component_property='value')]
-# )
 
-# def update_graph(x_axis, y_axis):
+@app.callback(
+    Output(component_id='the_graph', component_property='figure'),
+    [Input(component_id='xaxis_raditem', component_property='value'),
+     Input(component_id='yaxis_raditem', component_property='value')]
+)
+def update_graph(x_axis, y_axis):
 
-#     dff = mydataset for the graph im using
-#     # print(dff[[x_axis,y_axis]][:1])
+    dff = temp
+    # print(dff[[x_axis,y_axis]][:1])
 
-#     barchart=px.bar(
-#             data_frame=dff,
-#             x=x_axis,
-#             y=y_axis,
-#             title=y_axis+': by '+x_axis,
-#             # facet_col='Borough',
-#             # color='Borough',
-#             # barmode='group',
-#             )
+    fig = px.area(
+        data_frame=dff,
+        x=x_axis,
+        y=y_axis,
+        title=y_axis+': by '+x_axis,
+        color='Case',
+        color_discrete_sequence=["green", "red", "blue"],
+        # facet_col='Borough',
+        # color='Borough',
+        # barmode='group',
+    )
 
-#     barchart.update_layout(xaxis={'categoryorder':'total ascending'},
-#                            title={'xanchor':'center', 'yanchor': 'top', 'y':0.9,'x':0.5,})
+    fig.update_layout(
+        xaxis={'categoryorder': 'total ascending'},
+        title={'xanchor': 'center',
+               'yanchor': 'top', 'y': 0.9, 'x': 0.5, },
+        margin={'l': 0, 'r': 0, 'b': 0},
+        plot_bgcolor=colors['background'],
+        paper_bgcolor=colors['background'],
+        font_color=colors['text']
+    ),
 
-#     return (barchart)
+    return (fig)
 
 
 # ---------------------------------------------------------------------------------------------
