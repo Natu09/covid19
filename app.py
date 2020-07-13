@@ -21,6 +21,13 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output, State
 # ---------------------------------------------------------------------------------------------
 
+external_stylesheets = ['https://codepen.io/anon/pen/mardKv.css',
+                        'https://codepen.io/amyoshino/pen/jzXypZ.css']
+
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
+
+
 # Overwrite your CSS setting by including style locally
 colors = {
     'background': '#2D2D2D',
@@ -271,11 +278,6 @@ fig_line.update_layout(
 
 # ---------------------------------------------------------------------------------------------
 
-external_stylesheets = ['https://codepen.io/anon/pen/mardKv.css',
-                        'https://codepen.io/amyoshino/pen/jzXypZ.css']
-
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-server = app.server
 
 print("Here 16")
 
