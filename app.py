@@ -226,7 +226,7 @@ print("Here 14")
 fig_map = px.scatter_geo(covid_confirmed_agg_long,
                          lat="Lat", lon="Long", color="country",
                          hover_name="country", size="date_confirmed_cases",
-                         size_max=50, animation_frame="date",
+                         size_max=100, animation_frame="date",
                          projection="natural earth",
                          title="COVID-19 Worldwide Confirmed Cases Over Time")
 fig_map.update_layout(
@@ -275,7 +275,7 @@ external_stylesheets = ['https://codepen.io/anon/pen/mardKv.css',
                         'https://codepen.io/amyoshino/pen/jzXypZ.css']
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
-
+server = app.server
 
 print("Here 16")
 
