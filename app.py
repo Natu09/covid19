@@ -315,7 +315,8 @@ app.layout = html.Div(children=[
                     html.Br(),
                     dbc.ModalBody(
                         "This web application intends to serve as an informative guide around the novel \
-                            coronavirus. This was done using Python, ... (to be continued)"
+                            coronavirus. This project was done in Python, using Plotly for the visualizations, and Dash and Flask \
+                                to build this web application. Heroku was used to host this web application."
                     ),
                     html.Hr(),
                     dbc.ModalFooter(
