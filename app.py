@@ -3,7 +3,7 @@ __author__ = "Nathaniel Habtegergesa"
 
 """
 Dataset:
-    https://systems.jhu.edu/ 
+    https://systems.jhu.edu/
 """
 
 # ---------------------------------------------------------------------------------------------
@@ -68,6 +68,11 @@ recovered_df = pd.read_csv(
 url = 'https://raw.githubusercontent.com/imdevskp/covid_19_jhu_data_web_scrap_and_cleaning/master/covid_19_clean_complete.csv'
 full_table = pd.read_csv(url,
                          parse_dates=['Date'])
+demographic_df = pd.read_csv(
+    'https://covid.ourworldindata.org/data/owid-covid-data.csv')
+
+not_na = demographic_df["continent"].notna()
+demographic_df2 = demographic_df[not_na]
 
 # cases
 cases = ['Confirmed', 'Deaths', 'Recovered', 'Active']
@@ -275,6 +280,23 @@ fig_line.update_layout(
     margin={'l': 0, 'r': 0, 'b': 0},
     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
+#
+fig_matrix = px.scatter_matrix(demographic_df2, dimensions=["gdp_per_capita", "hospital_beds_per_thousand", "handwashing_facilities",
+                                                            "total_deaths_per_million"],
+                               color="continent", hover_name="location", symbol="continent",
+                               title="Is there a correlation between gdp and the coronavirus? and if so,    what factors might contribute to that corelation?")
+fig_matrix.update_traces(diagonal_visible=False)
+# fig_matrix.update_yaxes(tickangle=45)
+fig_matrix.update_layout(
+    plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
+
+df = px.data.gapminder()
+fig_scatter = px.scatter(df, x="gdpPercap", y="lifeExp", animation_frame="year", animation_group="country",
+                         size="pop", color="continent", hover_name="country", facet_col="continent",
+                         log_x=True, size_max=45, range_x=[100, 100000], range_y=[25, 90])
+fig_scatter.update_layout(
+    plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
+
 
 # ---------------------------------------------------------------------------------------------
 
@@ -440,7 +462,7 @@ app.layout = html.Div(children=[
                 'flex-direction': 'column',
                 'box-sizing': 'border-box',
                 # 'margin-left': 'auto',
-                # 'margin-righ    t': 'auto',
+                # 'margin-right': 'auto',
                 'height': '70vh',
                 'padding': '0.75rem',
                 'textAlign': 'center',
@@ -541,6 +563,32 @@ app.layout = html.Div(children=[
             ),
         ], className="six columns"),
 
+    ], className="row"),
+
+
+    html.Div([
+        dcc.Tabs([
+            dcc.Tab(label='Life expectancy vs. GDP per capita', children=[
+                dcc.Graph(figure=fig_scatter, style={
+                    'color': colors['text'],
+                    'backgroundColor': colors['background'],
+                    'border-color': colors['background'],
+                },
+                    className="twelve columns"),
+            ], style={
+                'color': colors['text'],
+                'backgroundColor':colors['background'], }),
+            dcc.Tab(label='Scatter Matrix', children=[
+                dcc.Graph(figure=fig_matrix, style={
+                    'color': colors['text'],
+                    'backgroundColor': colors['background'],
+                    'border-color': colors['background'],
+                },
+                    className="twelve columns"),
+            ], style={
+                'color': colors['text'],
+                'backgroundColor':colors['background'], }),
+        ]),
     ], className="row"),
 
 ], style={
