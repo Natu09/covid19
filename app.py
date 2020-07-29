@@ -5,6 +5,7 @@ __author__ = "Nathaniel Habtegergesa"
 Dataset:
     https://systems.jhu.edu/
 """
+# heroku logs --tail --app ntcovid19
 
 # ---------------------------------------------------------------------------------------------
 # imports
@@ -73,6 +74,9 @@ demographic_df = pd.read_csv(
 
 not_na = demographic_df["continent"].notna()
 demographic_df2 = demographic_df[not_na]
+demographic_df3 = demographic_df.dropna(
+    subset=['total_deaths_per_million', 'continent'])
+demographic_df3['gdp_per_capita'].fillna(0)
 
 # cases
 cases = ['Confirmed', 'Deaths', 'Recovered', 'Active']
@@ -281,10 +285,14 @@ fig_line.update_layout(
     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
 #
-fig_matrix = px.scatter_matrix(demographic_df2, dimensions=["gdp_per_capita", "hospital_beds_per_thousand", "handwashing_facilities",
-                                                            "total_deaths_per_million"],
-                               color="continent", hover_name="location", symbol="continent",
-                               title="Is there a correlation between gdp and the coronavirus? and if so,    what factors might contribute to that corelation?")
+fig_matrix = px.scatter_matrix(demographic_df2, dimensions=["gdp_per_capita", "hospital_beds_per_thousand", "handwashing_facilities"],
+                               labels={
+                                   "gdp_per_capita": 'GDPperCap',
+                                   "hospital_beds_per_thousand": 'BedsPer1000',
+                                   "handwashing_facilities": 'Handwashing'
+},
+    color="continent", hover_name="location", symbol="continent",
+    title="What are some factors that might contribute to that the coronavirus?")
 fig_matrix.update_traces(diagonal_visible=False)
 # fig_matrix.update_yaxes(tickangle=45)
 fig_matrix.update_layout(
@@ -292,12 +300,18 @@ fig_matrix.update_layout(
 
 df = px.data.gapminder()
 fig_scatter = px.scatter(df, x="gdpPercap", y="lifeExp", animation_frame="year", animation_group="country",
+                         title="Overtime you will see that as GDP increases, life expectancy also increases.",
                          size="pop", color="continent", hover_name="country", facet_col="continent",
                          log_x=True, size_max=45, range_x=[100, 100000], range_y=[25, 90])
 fig_scatter.update_layout(
     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
-
+fig_scatter2 = px.scatter(demographic_df3, x="gdp_per_capita", y="median_age",
+                          title="Is there a relationship between GDP, Life Expectancy, and the coronavirus?",
+                          size="total_deaths_per_million", color="continent",
+                          hover_name="location", log_x=True, size_max=60)
+fig_scatter2.update_layout(
+    plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 # ---------------------------------------------------------------------------------------------
 
 
@@ -578,6 +592,7 @@ app.layout = html.Div(children=[
             ], style={
                 'color': colors['text'],
                 'backgroundColor':colors['background'], }),
+
             dcc.Tab(label='Scatter Matrix', children=[
                 dcc.Graph(figure=fig_matrix, style={
                     'color': colors['text'],
@@ -588,6 +603,18 @@ app.layout = html.Div(children=[
             ], style={
                 'color': colors['text'],
                 'backgroundColor':colors['background'], }),
+
+            dcc.Tab(label='Scatter Plot', children=[
+                    dcc.Graph(figure=fig_scatter2, style={
+                        'color': colors['text'],
+                        'backgroundColor': colors['background'],
+                        'border-color': colors['background'],
+                    },
+                        className="twelve columns"),
+                    ], style={
+                'color': colors['text'],
+                'backgroundColor':colors['background'], }),
+
         ]),
     ], className="row"),
 
