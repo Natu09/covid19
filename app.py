@@ -239,18 +239,18 @@ print("Here 13")
 # Visualizations
 print("Here 14")
 # World map
-fig_map = px.scatter_geo(covid_confirmed_agg_long,
-                         lat="Lat", lon="Long", color="country",
-                         hover_name="country", size="date_confirmed_cases",
-                         size_max=100, animation_frame="date",
-                         projection="natural earth",
-                         title="COVID-19 Worldwide Confirmed Cases Over Time")
-fig_map.update_layout(
-    margin={'t': 30, 'l': 0, 'r': 0, 'b': 0},
-    plot_bgcolor=colors['background'],
-    paper_bgcolor=colors['background'],
-    font_color=colors['text']
-)
+# fig_map = px.scatter_geo(covid_confirmed_agg_long,
+#                          lat="Lat", lon="Long", color="country",
+#                          hover_name="country", size="date_confirmed_cases",
+#                          size_max=100, animation_frame="date",
+#                          projection="natural earth",
+#                          title="COVID-19 Worldwide Confirmed Cases Over Time")
+# fig_map.update_layout(
+#     margin={'t': 30, 'l': 0, 'r': 0, 'b': 0},
+#     plot_bgcolor=colors['background'],
+#     paper_bgcolor=colors['background'],
+#     font_color=colors['text']
+# )
 
 print("Here 15")
 # print(full_latest)
@@ -294,10 +294,10 @@ fig_matrix = px.scatter_matrix(demographic_df2, dimensions=["gdp_per_capita", "h
 },
     color="continent", hover_name="location", symbol="continent",
     title="What are some factors of GDP and Life Expectancy that might contribute to the Coronavirus?")
-fig_matrix.update_traces(diagonal_visible=False)
+fig_matrix.update_traces(diagonal_visible=True)
 # fig_matrix.update_yaxes(tickangle=45)
 fig_matrix.update_layout(
-    plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
+    paper_bgcolor=colors['background'], font_color=colors['text'])
 
 df = px.data.gapminder()
 fig_scatter = px.scatter(df, x="gdpPercap", y="lifeExp", animation_frame="year", animation_group="country",
@@ -471,26 +471,26 @@ app.layout = html.Div(children=[
 
 
     html.Div([
-        html.Div([
-            dcc.Graph(figure=fig_map, style={
-                'display': 'flex',
-                'flex-direction': 'column',
-                'box-sizing': 'border-box',
-                # 'margin-left': 'auto',
-                # 'margin-right': 'auto',
-                'height': '70vh',
-                'padding': '0.75rem',
-                'textAlign': 'center',
-                'color': colors['text'],
-                'backgroundColor': colors['background'],
-                'border-color': colors['background'],
-            },
-                className="twelve columns"),
-        ], style={
-            'textAlign': 'center',
-            'color': colors['text'],
-            'backgroundColor': colors['background'],
-        }),
+        # html.Div([
+        #     dcc.Graph(figure=fig_map, style={
+        #         'display': 'flex',
+        #         'flex-direction': 'column',
+        #         'box-sizing': 'border-box',
+        #         # 'margin-left': 'auto',
+        #         # 'margin-right': 'auto',
+        #         'height': '70vh',
+        #         'padding': '0.75rem',
+        #         'textAlign': 'center',
+        #         'color': colors['text'],
+        #         'backgroundColor': colors['background'],
+        #         'border-color': colors['background'],
+        #     },
+        #         className="twelve columns"),
+        # ], style={
+        #     'textAlign': 'center',
+        #     'color': colors['text'],
+        #     'backgroundColor': colors['background'],
+        # }),
 
     ], className="row"),
 
@@ -585,6 +585,8 @@ app.layout = html.Div(children=[
         dcc.Tabs([
             dcc.Tab(label='Life expectancy vs. GDP per capita', children=[
                 dcc.Graph(figure=fig_scatter, style={
+                    'width': '100%',
+                    'height': '100vh',
                     'color': colors['text'],
                     'backgroundColor': colors['background'],
                     'border-color': colors['background'],
@@ -596,6 +598,8 @@ app.layout = html.Div(children=[
 
             dcc.Tab(label='Scatter Matrix', children=[
                 dcc.Graph(figure=fig_matrix, style={
+                    'width': '100%',
+                    'height': '100vh',
                     'color': colors['text'],
                     'backgroundColor': colors['background'],
                     'border-color': colors['background'],
@@ -606,13 +610,15 @@ app.layout = html.Div(children=[
                 'backgroundColor':colors['background'], }),
 
             dcc.Tab(label='Scatter Plot', children=[
-                    dcc.Graph(figure=fig_scatter2, style={
-                        'color': colors['text'],
-                        'backgroundColor': colors['background'],
-                        'border-color': colors['background'],
-                    },
-                        className="twelve columns"),
-                    ], style={
+                dcc.Graph(figure=fig_scatter2, style={
+                    'width': '100%',
+                    'height': '100vh',
+                    'color': colors['text'],
+                    'backgroundColor': colors['background'],
+                    'border-color': colors['background'],
+                },
+                    className="twelve columns"),
+            ], style={
                 'color': colors['text'],
                 'backgroundColor':colors['background'], }),
 
