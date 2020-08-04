@@ -285,14 +285,15 @@ fig_line.update_layout(
     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
 #
-fig_matrix = px.scatter_matrix(demographic_df2, dimensions=["gdp_per_capita", "hospital_beds_per_thousand", "handwashing_facilities"],
+fig_matrix = px.scatter_matrix(demographic_df2, dimensions=["gdp_per_capita", "hospital_beds_per_thousand", "handwashing_facilities", "life_expectancy"],
                                labels={
                                    "gdp_per_capita": 'GDPperCap',
                                    "hospital_beds_per_thousand": 'BedsPer1000',
-                                   "handwashing_facilities": 'Handwashing'
+                                   "handwashing_facilities": 'Handwashing',
+                                   "life_expectancy": "LifeExp"
 },
     color="continent", hover_name="location", symbol="continent",
-    title="What are some factors that might contribute to that the coronavirus?")
+    title="What are some factors of GDP and Life Expectancy that might contribute to the Coronavirus?")
 fig_matrix.update_traces(diagonal_visible=False)
 # fig_matrix.update_yaxes(tickangle=45)
 fig_matrix.update_layout(
@@ -306,8 +307,8 @@ fig_scatter = px.scatter(df, x="gdpPercap", y="lifeExp", animation_frame="year",
 fig_scatter.update_layout(
     plot_bgcolor=colors['background'], paper_bgcolor=colors['background'], font_color=colors['text'])
 
-fig_scatter2 = px.scatter(demographic_df3, x="gdp_per_capita", y="median_age",
-                          title="Is there a relationship between GDP, Life Expectancy, and the coronavirus?",
+fig_scatter2 = px.scatter(demographic_df3, x="gdp_per_capita", y="life_expectancy",
+                          title="Is there a relationship between GDP, Life Expectancy, and the Coronavirus?",
                           size="total_deaths_per_million", color="continent",
                           hover_name="location", log_x=True, size_max=60)
 fig_scatter2.update_layout(
