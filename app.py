@@ -612,7 +612,7 @@ app.layout = html.Div(children=[
             dcc.Tab(label='Scatter Plot', children=[
                 dcc.Graph(figure=fig_scatter2, style={
                     'width': '100%',
-                    'height': '100vh',
+                    'height': '90vh',
                     'color': colors['text'],
                     'backgroundColor': colors['background'],
                     'border-color': colors['background'],
