@@ -582,11 +582,12 @@ app.layout = html.Div(children=[
 
 
     html.Div([
+        html.H2("Evaluation of Population Census Data"),
         dcc.Tabs([
             dcc.Tab(label='Life expectancy vs. GDP per capita', children=[
                 dcc.Graph(figure=fig_scatter, style={
                     'width': '100%',
-                    'height': '100vh',
+                    'height': '90vh',
                     'color': colors['text'],
                     'backgroundColor': colors['background'],
                     'border-color': colors['background'],
@@ -599,7 +600,7 @@ app.layout = html.Div(children=[
             dcc.Tab(label='Scatter Matrix', children=[
                 dcc.Graph(figure=fig_matrix, style={
                     'width': '100%',
-                    'height': '100vh',
+                    'height': '90vh',
                     'color': colors['text'],
                     'backgroundColor': colors['background'],
                     'border-color': colors['background'],
