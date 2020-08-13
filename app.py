@@ -363,7 +363,7 @@ app.layout = html.Div(children=[
                         })
                     ),
                 ],
-                id="modal", className="six columns offset-by-three",
+                id="modal", className="ten columns offset-by-one",
             ),
         ], style={
             'color': colors['text'],
