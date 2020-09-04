@@ -218,7 +218,7 @@ covid_confirmed_agg.loc[:, ['Lat', 'Long']
 print("Here 12")
 
 # Since there are a lot of countries, for easy visualization let us only look at countries with high numbers
-MIN_CASES = 1000
+MIN_CASES = 10000
 covid_confirmed_agg = covid_confirmed_agg[covid_confirmed_agg.iloc[:, 3:].max(
     axis=1) > MIN_CASES]
 
@@ -241,7 +241,7 @@ print("Here 14")
 fig_map = px.scatter_geo(covid_confirmed_agg_long,
                          lat="Lat", lon="Long", color="country",
                          hover_name="country", size="date_confirmed_cases",
-                         size_max=100, animation_frame="date",
+                         size_max=80,
                          projection="natural earth",
                          title="COVID-19 Worldwide Confirmed Cases Over Time")
 fig_map.update_layout(
